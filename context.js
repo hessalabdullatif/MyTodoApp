@@ -1,6 +1,10 @@
 import {createContext} from 'react';
 import todoStore from './stores/todoStore';
+import themeStore from './stores/themeStore'; 
 
-export const storesContext = createContext({
-  todoStore, // both lists live inside this one store now
+const StoresContext = createContext({
+  todoStore,
+  themeStore, 
 });
+
+export default StoresContext;

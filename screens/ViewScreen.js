@@ -1,0 +1,167 @@
+import React, {useState} from 'react';
+import {
+  View,
+  Text,
+//   Button,
+//   TextInput,
+ ImageBackground,
+  StyleSheet,
+ScrollView,
+// TouchableOpacity,
+// ActivityIndicator,
+StatusBar,
+SectionList
+} from 'react-native';
+import {SafeAreaView,SafeAreaProvider} from 'react-native-safe-area-context';
+// import {observer} from 'mobx-react-lite';
+// import useStores from '../hooks/useStores';
+import useStores from '../hooks/useStores';
+const image = require('../assets/Unknown.jpg');
+ const DATA = [
+  {
+    title: 'tech ',
+    data: ['Hessa', 'Renad', 'Raghad', 'Safaa'],
+  },
+  {
+    title: 'Marketing',
+    data: ['Wafaa', 'Rawabi'],
+  },
+  {
+    title: 'Sales',
+    data: ['Rafaa'],
+  },
+  {
+    title: 'Operations',
+    data: ['Layan', 'Jalo'],
+  },
+];
+
+const ViewScreen = () => (
+  
+  <SafeAreaProvider>
+
+ <ImageBackground source={image} resizeMode="cover" style={styles.background}>
+    
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <SectionList
+        sections={DATA}
+        keyExtractor={(item, index) => item + index}
+        renderItem={({item}) => (
+          <View style={styles.item}>
+            <Text style={styles.title}>{item}</Text>
+          </View>
+        )}
+        renderSectionHeader={({section: {title}}) => (
+          <Text style={styles.header}>{title}</Text>
+        )}
+      />
+    </SafeAreaView>
+        </ImageBackground>
+    
+  </SafeAreaProvider>
+
+);
+   
+
+const styles = StyleSheet.create({
+     background: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  container: {
+    flex: 1,
+    paddingTop: StatusBar.currentHeight,
+    marginHorizontal: 16,
+
+  },
+  item: {
+    backgroundColor: '#e7b4ed',
+    padding: 20,
+    marginVertical: 8,
+    borderRadius:20
+  },
+  header: {
+    fontSize: 32,
+    backgroundColor: '#fff',
+    borderRadius:20
+
+
+
+  },
+  title: {
+    fontSize: 24,
+  },
+});
+
+// export default function ViewScreen(){
+//     const [people,setPeople]=useState([
+//         {name : 'Hessa',key :'1'}, 
+//         {name : 'Renad',key :'2'},
+//         {name : 'Layan',key :'3'},
+//         {name : 'Wafa',key :'4'},
+//         {name : 'Raghad',key :'5'},
+//         {name : 'Safa',key :'6'},
+//         {name : 'Haneen',key :'7'},
+//         {name : 'Malak',key :'8'}, 
+//         {name : 'Lana',key :'9'},
+//         {name : 'Hala',key:'10'},
+//         {name : 'Maria',key:'11'},
+//         {name : 'Moana', key:'12'},
+//         {name : 'Salma',key :'13'},
+//         {name : 'Pola',key :'14'},
+
+//     ]);
+//     const pressHandler = (id) => {
+//         console.log(id);
+//         // setPeople((prevPeople)=>{
+//         // return prevPeople.filter(person=> person.id !=id)
+// // })
+    // }
+
+
+    // return(
+    //     <View style={styles.container}>
+           
+    //         <FlatList
+    //         keyExtractor={(item)=>item.id}
+    //         data={people}
+    //         renderItem={({item})=> (
+    //             <TouchableOpacity onPress={()=> pressHandler(item.id)}>
+    //                  <Text style ={styles.item}>{item.name}</Text>
+    //             </TouchableOpacity>
+       
+    //         )}
+            // />
+            // <ScrollView>
+            // {people.map((item)=>{
+            //     return (
+            //         <View key={item.key}> 
+            //         <Text style ={styles.item}>{item.name}</Text>
+            //         </View>
+            //     )
+            // })}
+            //    </ScrollView> 
+     
+     
+ 
+// }
+
+    // container:{
+    //     flex:1,
+    //     backgroundColor: '#fff',
+    //     paddingTop:40,
+    //     paddingHorizontal:20
+    // },
+    // item:{ 
+    //     marginTop: 24,
+    //     padding :30,
+    //     backgroundColor:'pink',
+    //     fontSize:24,
+    //     marginHorizontal:24
+        
+
+    // },
+export default ViewScreen;
+
+ 
