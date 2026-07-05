@@ -31,13 +31,12 @@ const ViewScreen = () => {
       const data = await response.json();
       setPostList(data);
     } catch (error) {
-      console.log('خطأ بجلب البيانات:', error);
+      console.log(' Error :', error);
     } finally {
       setIsLoading(false);
     }
   };
  
-  // لازم تكون async وتنتظر fetchData علشان الـ refreshing indicator يضل ظاهر لين يخلص الطلب فعلياً
   const handleRefresh = async () => {
     setRefreshing(true);
     await fetchData(20);
@@ -71,7 +70,6 @@ const ViewScreen = () => {
                   <Text style={styles.bodyText}>{item.body}</Text>
                 </View>
               )}
-              // هذا هو التصحيح الأساسي: refreshing و onRefresh لازم يكونوا props داخل الـ FlatList نفسه
               refreshing={refreshing}
               onRefresh={handleRefresh}
             />
