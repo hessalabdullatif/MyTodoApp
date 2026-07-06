@@ -1,44 +1,61 @@
-import React, { useState, useCallback } from 'react'; 
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
-  View, 
-  Text, 
-  ImageBackground, 
-  StyleSheet, 
-  Switch, 
+  View,
+  Text,
+  ImageBackground,
+  StyleSheet,
+  Switch,
   TouchableOpacity,
   RefreshControl,
-  ScrollView, 
+  ScrollView,
+  Animated,
 } from 'react-native';
-
-import { observer } from 'mobx-react-lite'; 
+ 
+import { observer } from 'mobx-react-lite';
 import useStores from '../hooks/useStores';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
+ 
 const image = require('../assets/Unknown.jpg');
-
+ 
 const menuItems = [
   { id: '1', label: 'Daily Todos', route: 'Todo' },
   { id: '2', label: 'Important Todos', route: 'ImportantTodo' },
   { id: '3', label: 'Test Screen', route: 'TestScreen' },
   { id: '4', label: 'View Screen', route: 'ViewScreen' },
   { id: '5', label: 'Fetch test', route: 'FetchApi' },
-    { id: '6', label: 'Weather', route: 'Weather' },
-
+  { id: '6', label: 'Weather', route: 'Weather' },
 ];
+ 
 
+const FadeInView = ({ style, children }) => {
+  const fadeAnim = useRef(new Animated.Value(0)).current; 
+ 
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 10000, 
+      useNativeDriver: true,
+    }).start();
+  }, [fadeAnim]);
+ 
+  return (
+    <Animated.View style={[style, { opacity: fadeAnim }]}>
+      {children}
+    </Animated.View>
+  );
+};
+ 
 const HomeScreen = observer(({ navigation }) => {
   const { themeStore } = useStores();
-  
   const [refreshing, setRefreshing] = useState(false);
-
+ 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-
     setTimeout(() => {
       setRefreshing(false);
     }, 1000);
   }, []);
-
+ 
   return (
     <ImageBackground source={image} resizeMode="cover" style={styles.background}>
       <View
@@ -51,17 +68,17 @@ const HomeScreen = observer(({ navigation }) => {
           },
         ]}
       />
-
+ 
       <SafeAreaView style={styles.container} edges={['left', 'right']}>
         <ScrollView
           style={{ width: '100%' }}
           contentContainerStyle={styles.scrollContent}
           refreshControl={
-            <RefreshControl 
-              refreshing={refreshing} 
-              onRefresh={onRefresh} 
-              tintColor={themeStore.isDarkMode ? '#fff' : '#000'} // Spinner color for iOS
-              colors={['#81b0ff']} 
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={themeStore.isDarkMode ? '#fff' : '#000'} // لون الدائرة الدوارة في iOS
+              colors={['#81b0ff']}
             />
           }
         >
@@ -73,15 +90,23 @@ const HomeScreen = observer(({ navigation }) => {
               trackColor={{ false: '#767577', true: '#81b0ff' }}
               thumbColor={themeStore.isDarkMode ? '#f5dd4b' : '#f4f3f4'}
               ios_backgroundColor="#3e3e3e"
-              onValueChange={themeStore.toggleTheme} 
+              onValueChange={themeStore.toggleTheme}
               value={themeStore.isDarkMode}
             />
           </View>
-
-          <Text style={[styles.title, { color: themeStore.isDarkMode ? '#ffffff' : '#180113' }]}>
-            MyTodoApp
-          </Text>
-
+ 
+          
+          <FadeInView>
+            <Text
+              style={[
+                styles.title,
+                { color: themeStore.isDarkMode ? '#fff' : '#000' },
+              ]}
+            >
+              MyTodoApp
+            </Text>
+          </FadeInView>
+ 
           <View style={styles.cardsGrid}>
             {menuItems.map(item => (
               <TouchableOpacity
@@ -104,17 +129,17 @@ const HomeScreen = observer(({ navigation }) => {
     </ImageBackground>
   );
 });
-
+ 
 export default HomeScreen;
-
+ 
 const styles = StyleSheet.create({
   background: { flex: 1, justifyContent: 'center' },
   overlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
   container: { flex: 1, paddingHorizontal: 20 },
-  scrollContent: { 
-    alignItems: 'center', 
-    paddingTop: 100, 
-    paddingBottom: 40 
+  scrollContent: {
+    alignItems: 'center',
+    paddingTop: 100,
+    paddingBottom: 40,
   },
   switchContainer: { position: 'absolute', top: 10, right: 0, flexDirection: 'row', alignItems: 'center' },
   title: { fontSize: 40, marginBottom: 30, fontWeight: 'bold' },
