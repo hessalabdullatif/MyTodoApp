@@ -4,73 +4,145 @@ import {
   Text,
   ImageBackground,
   StyleSheet,
-  ScrollView,
   ActivityIndicator,
   StatusBar,
-  SectionList,
   FlatList,
 } from 'react-native';
 import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
-import useStores from '../hooks/useStores';
 const image = require('../assets/Unknown.jpg');
- 
- 
+
+const TMDB_API_KEY = '3f40b2f4a03f760da9b434d6b8ddf3e4';
+
 const ViewScreen = () => {
   const [postList, setPostList] = useState([]);
-  //loading state
+
+  const [page, setPage] = useState(1);
+
   const [isLoading, setIsLoading] = useState(true);
-  //refreshing
+
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
   const [refreshing, setRefreshing] = useState(false);
- 
-  const fetchData = async (limit = 10) => {
+
+  const [isListEnd, setIsListEnd] = useState(false);
+
+  const [errorMessage, setErrorMessage] = useState(null);
+
+
+  const fetchData = async (pageNumber) => {
     try {
+      setErrorMessage(null);
+
       const response = await fetch(
-        `https://jsonplaceholder.typicode.com/posts?_limit=${limit}`
+        `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&include_adult=false&include_video=false&language=en-US&page=${pageNumber}&sort_by=popularity.desc`
       );
       const data = await response.json();
-      setPostList(data);
+
+      if (data.success === false) {
+        console.log('API Error:', data.status_message);
+        setErrorMessage(data.status_message || 'An error occurred while fetching data');
+        return;
+      }
+
+      const newResults = data.results || [];
+
+      if (newResults.length === 0 || pageNumber >= data.total_pages) {
+        setIsListEnd(true);
+      }
+
+      setPostList((prevList) => {
+        if (pageNumber === 1) {
+          return newResults;
+        }
+        return [...prevList, ...newResults];
+      });
     } catch (error) {
-      console.log(' Error :', error);
+      console.log('Error:', error);
+      setErrorMessage('Unable to connect to the internet');
     } finally {
       setIsLoading(false);
+      setIsLoadingMore(false);
+      setRefreshing(false);
     }
   };
- 
+
+  useEffect(() => {
+    fetchData(1);
+  }, []);
+
+  useEffect(() => {
+    if (page === 1) return; 
+    setIsLoadingMore(true);
+    fetchData(page);
+  }, [page]);
+
+  const handleLoadMore = () => {
+    if (!isLoadingMore && !isLoading && !isListEnd) {
+      setPage((prevPage) => prevPage + 1);
+    }
+  };
+
   const handleRefresh = async () => {
     setRefreshing(true);
-    await fetchData(20);
-    setRefreshing(false);
+    setIsListEnd(false);
+    setPage(1);
+    await fetchData(1);
   };
- 
-  useEffect(() => {
-    fetchData();
-  }, []);
- 
+
+  const renderFooter = () => {
+    if (isLoadingMore) {
+      return (
+        <View style={styles.footerContainer}>
+          <ActivityIndicator size="small" color="#0000ff" />
+          <Text style={styles.footerText}>Loading more...</Text>
+        </View>
+      );
+    }
+    if (isListEnd && postList.length > 0) {
+      return (
+        <View style={styles.footerContainer}>
+          <Text style={styles.footerText}>No more movies available</Text>
+        </View>
+      );
+    }
+    return null;
+  };
+
   if (isLoading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="0000ff" />
+        <ActivityIndicator size="large" color="#0000ff" />
         <Text>Loading ...</Text>
       </SafeAreaView>
     );
   }
- 
+
   return (
     <SafeAreaProvider>
       <ImageBackground source={image} resizeMode="cover" style={styles.background}>
         <SafeAreaView style={styles.container}>
           <View style={styles.listCountiner}>
+            {errorMessage && postList.length === 0 && (
+              <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>{errorMessage}</Text>
+              </View>
+            )}
+
             <FlatList
               data={postList}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => (
+              keyExtractor={(item, index) => `${item.id}-${index}`}
+              renderItem={({item}) => (
                 <View style={styles.card}>
                   <Text style={styles.titleText}>{item.title}</Text>
-                  <Text style={styles.bodyText}>{item.body}</Text>
+                  <Text style={styles.bodyText}>{item.overview}</Text>
                 </View>
               )}
               refreshing={refreshing}
               onRefresh={handleRefresh}
+              onEndReached={handleLoadMore}
+              onEndReachedThreshold={0.9}
+              ListFooterComponent={renderFooter}
+              ListEmptyComponent={<Text>No movies found</Text>}
             />
           </View>
         </SafeAreaView>
@@ -78,7 +150,7 @@ const ViewScreen = () => {
     </SafeAreaProvider>
   );
 };
- 
+
 const styles = StyleSheet.create({
   background: {
     flex: 1,
@@ -88,39 +160,56 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
-    paddingTop: StatusBar.currentHeight
+    paddingTop: StatusBar.currentHeight,
   },
   listCountiner: {
     flex: 1,
-    paddingHorizontal: 16
+    paddingHorizontal: 16,
   },
   card: {
     backgroundColor: 'white',
     padding: 10,
+    marginBottom: 10,
     borderRadius: 8,
-    borderWidth: 1
+    borderWidth: 1,
   },
   titleText: {
-    fontSize: 30
+    fontSize: 24,
+    fontWeight: 'bold',
   },
   bodyText: {
-    fontSize: 24,
-    color: '#666666' 
+    fontSize: 16,
+    color: '#666666',
   },
-  loadingContainer:{
-    flex :1,
+  loadingContainer: {
+    flex: 1,
     backgroundColor: '#F5F5F5',
-        paddingTop: StatusBar.currentHeight,
-        justifyContent : "center",
-        alignItems:'center'
- 
- 
-  }
+    paddingTop: StatusBar.currentHeight,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  footerContainer: {
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  footerText: {
+    marginTop: 6,
+    color: '#666666',
+    fontSize: 13,
+  },
+  errorContainer: {
+    padding: 12,
+    backgroundColor: '#ffe0e0',
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  errorText: {
+    color: '#cc0000',
+    textAlign: 'center',
+  },
 });
- 
+
 export default ViewScreen;
-
-
 
 // import React, {useState , useEffect} from 'react';
 // import {

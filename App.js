@@ -26,7 +26,7 @@ function Navigation() {
         <Stack.Screen name="Todo" component={TodoScreen} options={{ title: 'Daily' }} />
         <Stack.Screen name="ImportantTodo" component={ImportantTodoScreen} options={{ title: 'Important' }} />
         <Stack.Screen name="TestScreen" component={TestScreen} />
-        <Stack.Screen name="ViewScreen" component={ViewScreen} />
+        <Stack.Screen name="ViewScreen" component={ViewScreen} options={{ title: 'Movies' }}/>
         <Stack.Screen name="FetchApi" component={FetchApi} />
         <Stack.Screen name="Weather" component={WeatherScreen} options={{ title: 'Weather' }} />
       </Stack.Navigator>

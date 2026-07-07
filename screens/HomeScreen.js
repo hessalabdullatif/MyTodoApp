@@ -8,7 +8,7 @@ import {
   RefreshControl,
   ScrollView,
   Animated,
-  Switch, // جديد
+  Switch, 
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -18,10 +18,10 @@ const image = require('../assets/Unknown.jpg');
 const menuItems = [
   { id: '1', label: 'Daily Todos', route: 'Todo' },
   { id: '2', label: 'Important Todos', route: 'ImportantTodo' },
-  { id: '3', label: 'Test Screen', route: 'TestScreen' },
-  { id: '4', label: 'View Screen', route: 'ViewScreen' },
-  { id: '5', label: 'Fetch test', route: 'FetchApi' },
-  { id: '6', label: 'Weather', route: 'Weather' },
+  { id: '3', label: 'Athkhar', route: 'TestScreen' },
+  { id: '4', label: 'Movies', route: 'ViewScreen' },
+  { id: '5', label: 'Fetch Weather', route: 'FetchApi' },
+  { id: '6', label: 'Axios Weather', route: 'Weather' },
 ];
 
 const FadeInView = ({ style, children }) => {
