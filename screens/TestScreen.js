@@ -2,16 +2,14 @@ import React, {useState} from 'react';
 import {ImageBackground, 
     StyleSheet, 
     Text,
-     View, 
+    View, 
     ScrollView, 
     Switch,
-    SectionList,
-    StatusBar
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Ionicons} from '@expo/vector-icons';
-import {observer} from 'mobx-react-lite';
-import useStores from '../hooks/useStores';
+// 1. استيراد useTheme من حزمة React Navigation
+import { useTheme } from '@react-navigation/native';
 
 const image = require('../assets/Unknown.jpg');
 
@@ -84,31 +82,29 @@ const eveningAzkarData = [
   },
 ];
 
-const TestScreen = observer(({navigation}) => {
-  const {themeStore} = useStores();
-
-  
+const TestScreen = ({navigation}) => {
   const [isEveningMode, setIsEveningMode] = useState(false);
-  const toggleMode = () => setIsEveningMode(previousState => !previousState);
+  
+  // 2. تفعيل الـ Hook لجلب الألوان الحالية للتطبيق وحالة الـ Dark Mode
+  const { colors, dark } = useTheme();
 
+  const toggleMode = () => setIsEveningMode(previousState => !previousState);
   const currentAzkar = isEveningMode ? eveningAzkarData : morningAzkarData;
 
   return (
     <ImageBackground source={image} resizeMode="cover" style={styles.background}>
-      <View
+      {/* 3. جعل الـ overlay داكناً في الوضع المظلم لمنح النصوص البيضاء وضوحاً ممتازاً */}
+      <View 
         style={[
-          styles.overlay,
-          {
-            backgroundColor: themeStore.isDarkMode
-              ? 'rgba(0, 0, 0, 0.75)'
-              : 'rgba(255, 255, 255, 0.6)',
-          },
-        ]}
+          styles.overlay, 
+          { backgroundColor: dark ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)' }
+        ]} 
       />
 
       <SafeAreaView style={styles.container} edges={['left', 'right']}>
         <View style={styles.switchRow}>
-          <Text style={[styles.switchLabel, {color: themeStore.isDarkMode ? '#fff' : '#180113'}]}>
+          {/* 4. ربط لون نص الـ Switch بلون نصوص الثيم */}
+          <Text style={[styles.switchLabel, {color: colors.text}]}>
             {isEveningMode ? 'أذكار المساء' : 'أذكار الصباح'}
           </Text>
           <Switch
@@ -120,7 +116,8 @@ const TestScreen = observer(({navigation}) => {
           />
         </View>
 
-        <Text style={[styles.title, {color: themeStore.isDarkMode ? '#fff' : '#180113'}]}>
+        {/* 5. ربط لون العنوان الأساسي بالثيم */}
+        <Text style={[styles.title, {color: colors.text}]}>
           {isEveningMode ? 'أذكار المساء' : 'أذكار الصباح'}
         </Text>
 
@@ -132,24 +129,34 @@ const TestScreen = observer(({navigation}) => {
           {currentAzkar.map(zekr => (
             <View
               key={zekr.id}
-              style={[styles.card, {backgroundColor: themeStore.isDarkMode ? '#1E1E2E' : '#ffffff'}]}
+              // 6. جعل خلفية الكرت تتبع colors.card وتحديد حدود خفيفة في الـ Dark Mode
+              style={[
+                styles.card, 
+                { 
+                  backgroundColor: colors.card,
+                  borderColor: colors.border,
+                  borderWidth: dark ? 1 : 0
+                }
+              ]}
             >
               <View style={styles.cardHeader}>
+                {/* 7. تلوين أيقونة الشمس/القمر بلون الهوية الموحد للتطبيق (colors.primary) */}
                 <Ionicons
                   name={zekr.icon}
                   size={28}
-                  color={themeStore.isDarkMode ? '#FFD60A' : '#4630EB'}
+                  color={colors.primary}
                 />
-                <Text style={[styles.cardTitle, {color: themeStore.isDarkMode ? '#fff' : '#180113'}]}>
+                <Text style={[styles.cardTitle, {color: colors.text}]}>
                   {zekr.title}
                 </Text>
               </View>
 
-              <Text style={[styles.cardText, {color: themeStore.isDarkMode ? '#ddd' : '#333'}]}>
+              <Text style={[styles.cardText, {color: colors.text}]}>
                 {zekr.text}
               </Text>
 
-              <Text style={[styles.cardCount, {color: themeStore.isDarkMode ? '#999' : '#888'}]}>
+              {/* 8. جعل لون عداد الذكر رمادياً خفيفاً بالوضع المظلم لراحة العين */}
+              <Text style={[styles.cardCount, {color: dark ? '#aaa' : '#888'}]}>
                 {zekr.count}
               </Text>
             </View>
@@ -158,7 +165,7 @@ const TestScreen = observer(({navigation}) => {
       </SafeAreaView>
     </ImageBackground>
   );
-});
+};
 
 export default TestScreen;
 
@@ -185,7 +192,8 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  cardHeader: {flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12, backgroundColor:"pink"},
+  // تنويه: قمنا بحذف الـ backgroundColor: "pink" الثابتة من هنا حتى لا تتدخل الألوان وتخرب الثيم
+  cardHeader: {flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12},
   cardTitle: {fontSize: 18, fontWeight: 'bold'},
   cardText: {fontSize: 16, lineHeight: 26, textAlign: 'right'},
   cardCount: {fontSize: 13, marginTop: 12, textAlign: 'left'},

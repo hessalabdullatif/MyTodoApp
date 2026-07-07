@@ -14,15 +14,19 @@ import {Ionicons} from '@expo/vector-icons';
 import {Checkbox} from 'expo-checkbox';
 import {observer} from 'mobx-react-lite';
 import useStores from '../hooks/useStores';
+// 1. استيراد useTheme من حزمة React Navigation لربطه بالنظام الأساسي
+import {useTheme} from '@react-navigation/native';
 
 const image = require('../assets/Unknown.jpg');
 const keyExtractor = item => item.id.toString();
 
 const TodoScreen = observer(({navigation}) => {
-  // نقرأ themeStore هنا بدل useState المحلي
-  const {todoStore, themeStore} = useStores();
+  const {todoStore} = useStores();
   const [todoText, setTodoText] = useState('');
   const [searchText, setSearchText] = useState('');
+
+  // 2. تفعيل الـ Hook لاستخراج الألوان وحالة المظهر (dark)
+  const {colors, dark} = useTheme();
 
   const handleAdd = () => {
     if (todoText.trim().length === 0) return;
@@ -37,30 +41,23 @@ const TodoScreen = observer(({navigation}) => {
 
   return (
     <ImageBackground source={image} resizeMode="cover" style={styles.background}>
-      <View
+      {/* 3. جعل الـ overlay معتماً في الوضع المظلم لتوفير رؤية مريحة للنصوص البيضاء */}
+      <View 
         style={[
-          styles.overlay,
-          {
-            backgroundColor: themeStore.isDarkMode
-              ? 'rgba(0, 0, 0, 0.7)'
-              : 'rgba(255, 255, 255, 0.6)',
-          },
-        ]}
+          styles.overlay, 
+          { backgroundColor: dark ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)' }
+        ]} 
       />
 
       <SafeAreaView style={styles.container}>
 
-        <View
-          style={[
-            styles.searchBar,
-            {backgroundColor: themeStore.isDarkMode ? '#333' : '#f5f5f5'},
-          ]}
-        >
-          <Ionicons name="search" size={24} color={themeStore.isDarkMode ? '#fff' : '#333'} />
+        {/* 4. تغيير لون شريط البحث وأيقونته ونصوصه بناءً على ألوان الثيم */}
+        <View style={[styles.searchBar, {backgroundColor: colors.card}]}>
+          <Ionicons name="search" size={24} color={colors.text} />
           <TextInput
             placeholder="Search"
-            placeholderTextColor={themeStore.isDarkMode ? '#aaa' : '#888'}
-            style={[styles.searchInput, {color: themeStore.isDarkMode ? '#fff' : '#333'}]}
+            placeholderTextColor={dark ? '#aaa' : '#888'}
+            style={[styles.searchInput, {color: colors.text}]}
             clearButtonMode="always"
             value={searchText}
             onChangeText={setSearchText}
@@ -73,7 +70,8 @@ const TodoScreen = observer(({navigation}) => {
           renderItem={({item}) => (
             <TodoItem
               todo={item}
-              isDarkMode={themeStore.isDarkMode}
+              colors={colors} // 5. تمرير ألوان الثيم لعنصر القائمة الفردي بالأسفل
+              dark={dark}
               onDelete={() => todoStore.removeDailyTodo(item.id)}
               onToggle={() => todoStore.toggleDailyTodo(item.id)}
             />
@@ -83,18 +81,22 @@ const TodoScreen = observer(({navigation}) => {
         <View style={styles.footer}>
           <TextInput
             placeholder="Add New Task"
-            placeholderTextColor={themeStore.isDarkMode ? '#aaa' : '#888'}
+            placeholderTextColor={dark ? '#aaa' : '#888'}
             value={todoText}
             onChangeText={setTodoText}
             style={[
               styles.newTodoInput,
               {
-                backgroundColor: themeStore.isDarkMode ? '#333' : '#fff',
-                color: themeStore.isDarkMode ? '#fff' : '#333',
+                backgroundColor: colors.card,
+                color: colors.text,
               },
             ]}
           />
-          <TouchableOpacity style={styles.addButton} onPress={handleAdd}>
+          {/* 6. جعل زر الإضافة يتبع لونك المميز المختار في الملف (colors.primary) */}
+          <TouchableOpacity 
+            style={[styles.addButton, {backgroundColor: colors.primary}]} 
+            onPress={handleAdd}
+          >
             <Ionicons name="add" size={24} color={'#ffffff'} />
           </TouchableOpacity>
         </View>
@@ -105,26 +107,37 @@ const TodoScreen = observer(({navigation}) => {
 
 export default TodoScreen;
 
-const TodoItem = observer(({todo, onDelete, onToggle, isDarkMode}) => (
-  <View style={[styles.todoContainer, {backgroundColor: isDarkMode ? '#2a2a2a' : '#fff'}]}>
+// 7. تحديث مكون الـ TodoItem ليستجيب ديناميكياً لتغييرات المظهر
+const TodoItem = observer(({todo, onDelete, onToggle, colors, dark}) => (
+  <View 
+    style={[
+      styles.todoContainer, 
+      { 
+        backgroundColor: colors.card,
+        borderColor: colors.border,
+        borderWidth: dark ? 1 : 0 
+      }
+    ]}
+  >
     <View style={styles.todoInfoContainer}>
+      {/* الـ Checkbox يتلون بالبنفسجي/الوردي الحاسم الخاص بك عند إتمام المهمة */}
       <Checkbox
         value={todo.done}
         onValueChange={onToggle}
-        color={todo.done ? '#4630EB' : undefined}
+        color={todo.done ? colors.primary : undefined}
       />
       <Text
         style={[
           styles.todoText,
-          {color: isDarkMode ? '#fff' : '#333'},
-          todo.done && {textDecorationLine: 'line-through', color: '#aaa'},
+          {color: colors.text},
+          todo.done && {textDecorationLine: 'line-through', color: dark ? '#777' : '#aaa'},
         ]}
       >
         {todo.text}
       </Text>
     </View>
     <TouchableOpacity onPress={onDelete}>
-      <Ionicons name="trash" size={24} color={'red'} />
+      <Ionicons name="trash" size={24} color={dark ? '#ff6b6b' : 'red'} />
     </TouchableOpacity>
   </View>
 ));
@@ -155,7 +168,6 @@ const styles = StyleSheet.create({
   footer: {flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 20, marginBottom: 10},
   newTodoInput: {flex: 1, padding: 16, borderRadius: 10, fontSize: 16},
   addButton: {
-    backgroundColor: '#4630EB',
     padding: 16,
     borderRadius: 10,
     marginLeft: 20,

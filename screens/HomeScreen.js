@@ -4,19 +4,17 @@ import {
   Text,
   ImageBackground,
   StyleSheet,
-  Switch,
   TouchableOpacity,
   RefreshControl,
   ScrollView,
   Animated,
+  Switch, // جديد
 } from 'react-native';
- 
-import { observer } from 'mobx-react-lite';
-import useStores from '../hooks/useStores';
+import { useTheme } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
- 
+import { useAppTheme } from '../ThemeContext';
 const image = require('../assets/Unknown.jpg');
- 
+
 const menuItems = [
   { id: '1', label: 'Daily Todos', route: 'Todo' },
   { id: '2', label: 'Important Todos', route: 'ImportantTodo' },
@@ -25,50 +23,47 @@ const menuItems = [
   { id: '5', label: 'Fetch test', route: 'FetchApi' },
   { id: '6', label: 'Weather', route: 'Weather' },
 ];
- 
 
 const FadeInView = ({ style, children }) => {
-  const fadeAnim = useRef(new Animated.Value(0)).current; 
- 
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
   useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
-      duration: 10000, 
+      duration: 1000,
       useNativeDriver: true,
     }).start();
   }, [fadeAnim]);
- 
+
   return (
     <Animated.View style={[style, { opacity: fadeAnim }]}>
       {children}
     </Animated.View>
   );
 };
- 
-const HomeScreen = observer(({ navigation }) => {
-  const { themeStore } = useStores();
+
+const HomeScreen = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
- 
+
+  const { colors, dark } = useTheme();
+  const { isDark, toggleTheme } = useAppTheme(); 
+
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
       setRefreshing(false);
     }, 1000);
   }, []);
- 
+
   return (
     <ImageBackground source={image} resizeMode="cover" style={styles.background}>
       <View
         style={[
           styles.overlay,
-          {
-            backgroundColor: themeStore.isDarkMode
-              ? 'rgba(0, 0, 0, 0.7)'
-              : 'rgba(255, 255, 255, 0.6)',
-          },
+          { backgroundColor: dark ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)' }
         ]}
       />
- 
+
       <SafeAreaView style={styles.container} edges={['left', 'right']}>
         <ScrollView
           style={{ width: '100%' }}
@@ -77,48 +72,39 @@ const HomeScreen = observer(({ navigation }) => {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              tintColor={themeStore.isDarkMode ? '#fff' : '#000'} // لون الدائرة الدوارة في iOS
-              colors={['#81b0ff']}
+              tintColor={colors.text}
+              colors={[colors.primary]}
             />
           }
         >
-          <View style={styles.switchContainer}>
-            <Text style={{ color: themeStore.isDarkMode ? '#fff' : '#000', marginRight: 8 }}>
-              {themeStore.isDarkMode ? 'Dark Mode' : 'Light Mode'}
-            </Text>
-            <Switch
-              trackColor={{ false: '#767577', true: '#81b0ff' }}
-              thumbColor={themeStore.isDarkMode ? '#f5dd4b' : '#f4f3f4'}
-              ios_backgroundColor="#3e3e3e"
-              onValueChange={themeStore.toggleTheme}
-              value={themeStore.isDarkMode}
-            />
-          </View>
- 
-          
           <FadeInView>
-            <Text
-              style={[
-                styles.title,
-                { color: themeStore.isDarkMode ? '#fff' : '#000' },
-              ]}
-            >
+            <Text style={[styles.title, { color: colors.text }]}>
               MyTodoApp
             </Text>
           </FadeInView>
- 
+
+         
+          <View style={styles.themeSwitchRow}>
+            <Text style={{ color: colors.text }}>Dark Mode</Text>
+            <Switch value={isDark} onValueChange={toggleTheme} />
+          </View>
+
           <View style={styles.cardsGrid}>
             {menuItems.map(item => (
               <TouchableOpacity
                 key={item.id}
                 style={[
                   styles.card,
-                  { backgroundColor: themeStore.isDarkMode ? '#2a2a2a' : '#ffffff' },
+                  {
+                    backgroundColor: colors.card,
+                    borderColor: colors.border,
+                    borderWidth: dark ? 1 : 0
+                  }
                 ]}
                 onPress={() => navigation.navigate(item.route)}
                 activeOpacity={0.7}
               >
-                <Text style={[styles.cardLabel, { color: themeStore.isDarkMode ? '#fff' : '#180113' }]}>
+                <Text style={[styles.cardLabel, { color: colors.text }]}>
                   {item.label}
                 </Text>
               </TouchableOpacity>
@@ -128,10 +114,10 @@ const HomeScreen = observer(({ navigation }) => {
       </SafeAreaView>
     </ImageBackground>
   );
-});
- 
+};
+
 export default HomeScreen;
- 
+
 const styles = StyleSheet.create({
   background: { flex: 1, justifyContent: 'center' },
   overlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
@@ -141,8 +127,14 @@ const styles = StyleSheet.create({
     paddingTop: 100,
     paddingBottom: 40,
   },
-  switchContainer: { position: 'absolute', top: 10, right: 0, flexDirection: 'row', alignItems: 'center' },
   title: { fontSize: 40, marginBottom: 30, fontWeight: 'bold' },
+  themeSwitchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    marginBottom: 20,
+  },
   cardsGrid: { flexDirection: 'column', width: '100%', gap: 16 },
   card: {
     width: '100%',

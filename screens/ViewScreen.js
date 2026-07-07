@@ -2,101 +2,124 @@ import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
+  ImageBackground,
   StyleSheet,
-  FlatList,
+  ScrollView,
   ActivityIndicator,
-  SafeAreaView,
+  StatusBar,
+  SectionList,
+  FlatList,
 } from 'react-native';
-
+import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
+import useStores from '../hooks/useStores';
+const image = require('../assets/Unknown.jpg');
+ 
+ 
 const ViewScreen = () => {
-  const [dataList, setDataList] = useState([]);
-  const [page, setPage] = useState(1);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [isListEnd, setIsListEnd] = useState(false); // ✅ جديد: يوقف الطلبات لو خلصت البيانات
-
-  const fetchData = async (pageNumber) => {
-    const response = await fetch(
-      `https://jsonplaceholder.typicode.com/posts?_page=${pageNumber}&_limit=10`
-    );
-    const data = await response.json();
-    return data;
-  };
-
-  useEffect(() => {
-    fetchData(1).then((data) => {
-      setDataList(data);
-    });
-  }, []);
-
-  const loadMore = async () => {
-    if (isLoadingMore || isListEnd) return; // ✅ إضافة isListEnd هنا
-    setIsLoadingMore(true);
-
-    const nextPage = page + 1;
-    const newData = await fetchData(nextPage);
-
-    if (newData.length === 0) {
-      setIsListEnd(true); // ✅ ما فيه بيانات جديدة = وصلنا آخر صفحة
-    } else {
-      setDataList((prev) => [...prev, ...newData]);
-      setPage(nextPage);
+  const [postList, setPostList] = useState([]);
+  //loading state
+  const [isLoading, setIsLoading] = useState(true);
+  //refreshing
+  const [refreshing, setRefreshing] = useState(false);
+ 
+  const fetchData = async (limit = 10) => {
+    try {
+      const response = await fetch(
+        `https://jsonplaceholder.typicode.com/posts?_limit=${limit}`
+      );
+      const data = await response.json();
+      setPostList(data);
+    } catch (error) {
+      console.log(' Error :', error);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoadingMore(false);
   };
-
+ 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchData(20);
+    setRefreshing(false);
+  };
+ 
+  useEffect(() => {
+    fetchData();
+  }, []);
+ 
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="0000ff" />
+        <Text>Loading ...</Text>
+      </SafeAreaView>
+    );
+  }
+ 
   return (
-    <SafeAreaView style={styles.container}>
-      <FlatList
-        data={dataList}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text style={styles.title}>{item.title}</Text>
-            <Text style={styles.bodyText}>{item.body}</Text>
+    <SafeAreaProvider>
+      <ImageBackground source={image} resizeMode="cover" style={styles.background}>
+        <SafeAreaView style={styles.container}>
+          <View style={styles.listCountiner}>
+            <FlatList
+              data={postList}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item }) => (
+                <View style={styles.card}>
+                  <Text style={styles.titleText}>{item.title}</Text>
+                  <Text style={styles.bodyText}>{item.body}</Text>
+                </View>
+              )}
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+            />
           </View>
-        )}
-        onEndReached={loadMore}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={
-          isLoadingMore ? (
-            <ActivityIndicator size="small" />
-          ) : isListEnd ? (
-            <Text style={styles.endText}>No more posts</Text> // ✅ جديد
-          ) : null
-        }
-      />
-    </SafeAreaView>
+        </SafeAreaView>
+      </ImageBackground>
+    </SafeAreaProvider>
   );
 };
-
+ 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
   container: {
     flex: 1,
+    backgroundColor: '#f5f5f5',
+    paddingTop: StatusBar.currentHeight
+  },
+  listCountiner: {
+    flex: 1,
+    paddingHorizontal: 16
   },
   card: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    backgroundColor : 'fff'
+    backgroundColor: 'white',
+    padding: 10,
+    borderRadius: 8,
+    borderWidth: 1
   },
- 
-  title: {
-    fontSize: 25,
+  titleText: {
+    fontSize: 30
   },
   bodyText: {
-    fontSize: 14,
-    color: '#ef94ec',
-    lineHeight: 20, 
+    fontSize: 24,
+    color: '#666666' 
   },
-  endText: { 
-    textAlign: 'center',
-    padding: 12,
-    color: '#888',
-  },
+  loadingContainer:{
+    flex :1,
+    backgroundColor: '#F5F5F5',
+        paddingTop: StatusBar.currentHeight,
+        justifyContent : "center",
+        alignItems:'center'
+ 
+ 
+  }
 });
-
+ 
 export default ViewScreen;
+
 
 
 // import React, {useState , useEffect} from 'react';
