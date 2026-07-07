@@ -17,7 +17,7 @@ const ViewScreen = () => {
   const [postList, setPostList] = useState([]);
 
   const [page, setPage] = useState(1);
-
+// 
   const [isLoading, setIsLoading] = useState(true);
 
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -131,12 +131,30 @@ const ViewScreen = () => {
             <FlatList
               data={postList}
               keyExtractor={(item, index) => `${item.id}-${index}`}
-              renderItem={({item}) => (
-                <View style={styles.card}>
-                  <Text style={styles.titleText}>{item.title}</Text>
-                  <Text style={styles.bodyText}>{item.overview}</Text>
-                </View>
-              )}
+         renderItem={({ item }) => (
+  <View style={styles.movieCard}>
+    <View style={styles.cardHeader}>
+      <Text style={styles.cardTitle} numberOfLines={2}>
+        {item.title}
+      </Text>
+      <View style={styles.ratingBadge}>
+        <Text style={styles.ratingText}>⭐ {item.vote_average?.toFixed(1)}</Text>
+      </View>
+    </View>
+
+    {item.release_date && (
+      <Text style={styles.releaseDate}>
+        📅 Release Year: {item.release_date.split('-')[0]}
+      </Text>
+    )}
+
+    <View style={styles.divider} />
+
+    <Text style={styles.cardOverview} numberOfLines={4}>
+      {item.overview || "No overview available for this movie."}
+    </Text>
+  </View>
+)}
               refreshing={refreshing}
               onRefresh={handleRefresh}
               onEndReached={handleLoadMore}
@@ -206,6 +224,63 @@ const styles = StyleSheet.create({
   errorText: {
     color: '#cc0000',
     textAlign: 'center',
+  },
+  movieCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 3, 
+    borderWidth: 1,
+    borderColor: '#eaeaea', 
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between', 
+    alignItems: 'flex-start',
+    gap: 10,
+  },
+  cardTitle: {
+    flex: 1, 
+    fontSize: 19,
+    fontWeight: '700',
+    color: '#2c3e50', 
+    lineHeight: 24,
+  },
+  ratingBadge: {
+    backgroundColor: '#fef9e7', 
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#fcf3cf',
+  },
+  ratingText: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: '#f39c12',
+  },
+  releaseDate: {
+    fontSize: 12,
+    color: '#7f8c8d',
+    marginTop: 6,
+    fontWeight: '500',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#f2f4f4', 
+    verticalAlign: 'middle',
+    marginVertical: 12,
+  },
+  cardOverview: {
+    fontSize: 14,
+    color: '#566573',
+    lineHeight: 20, 
+    textAlign: 'justify',
   },
 });
 
