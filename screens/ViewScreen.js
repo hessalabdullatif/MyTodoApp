@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   bodyText: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#666666',
   },
   loadingContainer: {
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     flex: 1, 
-    fontSize: 19,
+    fontSize: 20,
     fontWeight: '700',
     color: '#2c3e50', 
     lineHeight: 24,

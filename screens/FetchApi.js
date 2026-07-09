@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   text: {
-    fontSize: 24,
+    fontSize: 25,
     color: '#fff',
   },
 });

@@ -14,7 +14,6 @@ import {Ionicons} from '@expo/vector-icons';
 import {Checkbox} from 'expo-checkbox';
 import {observer} from 'mobx-react-lite';
 import useStores from '../hooks/useStores';
-// 1. استيراد useTheme من حزمة React Navigation لربطه بالنظام الأساسي
 import {useTheme} from '@react-navigation/native';
 
 const image = require('../assets/Unknown.jpg');
@@ -25,7 +24,6 @@ const TodoScreen = observer(({navigation}) => {
   const [todoText, setTodoText] = useState('');
   const [searchText, setSearchText] = useState('');
 
-  // 2. تفعيل الـ Hook لاستخراج الألوان وحالة المظهر (dark)
   const {colors, dark} = useTheme();
 
   const handleAdd = () => {
@@ -41,7 +39,6 @@ const TodoScreen = observer(({navigation}) => {
 
   return (
     <ImageBackground source={image} resizeMode="cover" style={styles.background}>
-      {/* 3. جعل الـ overlay معتماً في الوضع المظلم لتوفير رؤية مريحة للنصوص البيضاء */}
       <View 
         style={[
           styles.overlay, 
@@ -51,7 +48,6 @@ const TodoScreen = observer(({navigation}) => {
 
       <SafeAreaView style={styles.container}>
 
-        {/* 4. تغيير لون شريط البحث وأيقونته ونصوصه بناءً على ألوان الثيم */}
         <View style={[styles.searchBar, {backgroundColor: colors.card}]}>
           <Ionicons name="search" size={24} color={colors.text} />
           <TextInput
@@ -70,7 +66,7 @@ const TodoScreen = observer(({navigation}) => {
           renderItem={({item}) => (
             <TodoItem
               todo={item}
-              colors={colors} // 5. تمرير ألوان الثيم لعنصر القائمة الفردي بالأسفل
+              colors={colors} 
               dark={dark}
               onDelete={() => todoStore.removeDailyTodo(item.id)}
               onToggle={() => todoStore.toggleDailyTodo(item.id)}
@@ -92,7 +88,6 @@ const TodoScreen = observer(({navigation}) => {
               },
             ]}
           />
-          {/* 6. جعل زر الإضافة يتبع لونك المميز المختار في الملف (colors.primary) */}
           <TouchableOpacity 
             style={[styles.addButton, {backgroundColor: colors.primary}]} 
             onPress={handleAdd}
@@ -107,7 +102,6 @@ const TodoScreen = observer(({navigation}) => {
 
 export default TodoScreen;
 
-// 7. تحديث مكون الـ TodoItem ليستجيب ديناميكياً لتغييرات المظهر
 const TodoItem = observer(({todo, onDelete, onToggle, colors, dark}) => (
   <View 
     style={[
@@ -120,7 +114,6 @@ const TodoItem = observer(({todo, onDelete, onToggle, colors, dark}) => (
     ]}
   >
     <View style={styles.todoInfoContainer}>
-      {/* الـ Checkbox يتلون بالبنفسجي/الوردي الحاسم الخاص بك عند إتمام المهمة */}
       <Checkbox
         value={todo.done}
         onValueChange={onToggle}
@@ -148,7 +141,7 @@ const styles = StyleSheet.create({
   container: {flex: 1, paddingHorizontal: 20},
   searchBar: {
     flexDirection: 'row',
-    padding: 16,
+    padding: 15,
     borderRadius: 10,
     gap: 10,
     marginBottom: 20,

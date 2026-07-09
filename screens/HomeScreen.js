@@ -150,5 +150,5 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  cardLabel: { fontSize: 18, fontWeight: '600', textAlign: 'center' },
+  cardLabel: { fontSize: 19, fontWeight: '600', textAlign: 'center' },
 });

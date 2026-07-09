@@ -16,10 +16,11 @@ import FormSheet from './screens/FormSheet.js';
 
 const Stack = createNativeStackNavigator();
 const Tabs = createBottomTabNavigator();
-
+// i added the most important component "in my app"the demo was diffrent
 function MainTabs() {
   return (
     <Tabs.Navigator screenOptions={{
+      // i can also make it fade but i like the shift more
       animation : "shift",
     }}>
       <Tabs.Screen name="Todo" component={TodoScreen} options={{ title: 'Daily' }} />

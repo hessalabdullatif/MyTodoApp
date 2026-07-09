@@ -53,13 +53,9 @@ const styles = StyleSheet.create({
     height: '100%',
   },
  
-  container: {
-    flexGrow: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+
   text: {
-    fontSize: 24,
+    fontSize: 25,
     color:'#fff'
   },
 });
