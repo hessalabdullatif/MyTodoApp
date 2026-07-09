@@ -12,7 +12,9 @@ import ViewScreen from './screens/ViewScreen';
 import FetchApi from './screens/FetchApi';
 import WeatherScreen from './screens/WeatherScreen';
 import HomeScreen from './screens/HomeScreen.js';
-import FormSheet from './screens/FormSheet.js';
+import QuickTodo from './screens/QuickTodo.js';
+import { Platform } from 'react-native';
+import { ScreenStack } from 'react-native-screens';
 
 const Stack = createNativeStackNavigator();
 const Tabs = createBottomTabNavigator();
@@ -22,8 +24,8 @@ function MainTabs() {
     <Tabs.Navigator screenOptions={{
       // i can also make it fade but i like the shift more
       animation : "shift",
+      tabBarPosition : Platform.select({web:"left"}) // only works on web
     }}>
-      <Tabs.Screen name="Todo" component={TodoScreen} options={{ title: 'Daily' }} />
             <Tabs.Screen name="Home" component={HomeScreen} options={{ title: 'Home' }} />
 
       <Tabs.Screen
@@ -45,11 +47,13 @@ function Navigation() {
           component={MainTabs}
           options={{ headerShown: false }}
         />
+        <Stack.Screen name="TodoScreen" component={TodoScreen} />
         <Stack.Screen name="TestScreen" component={TestScreen} />
         <Stack.Screen name="ViewScreen" component={ViewScreen} options={{ title: 'Movies' }} />
         <Stack.Screen name="FetchApi" component={FetchApi} />
         <Stack.Screen name="Weather" component={WeatherScreen} options={{ title: 'Weather' }} />
-        <Stack.Screen name="FormSheet" component={FormSheet} options={{ title: 'Form' }} />
+        <Stack.Screen name="QuickTodo" component={QuickTodo} options={{ title: 'Post'   , presentation: "formSheet",
+           sheetAllowedDetents: "all", }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

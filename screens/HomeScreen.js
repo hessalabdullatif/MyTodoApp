@@ -16,13 +16,13 @@ import { useAppTheme } from '../ThemeContext';
 const image = require('../assets/Unknown.jpg');
 
 const menuItems = [
-
-  { id: '3', label: 'Athkhar', route: 'TestScreen' },
-  { id: '4', label: 'Movies', route: 'ViewScreen' },
-  { id: '5', label: 'Fetch Weather', route: 'FetchApi' },
-  { id: '6', label: 'Axios Weather', route: 'Weather' },
-    { id: '7', label: 'Form Sheet', route: 'FormSheet' },
-
+ 
+     { id: '1', label: 'Quick ', route: 'QuickTodo' },
+  { id: '2', label: 'Athkhar', route: 'TestScreen' },
+  { id: '3', label: 'Movies', route: 'ViewScreen' },
+  { id: '4', label: 'Fetch Weather', route: 'FetchApi' },
+  { id: '5', label: 'Axios Weather', route: 'Weather' },
+{ id: '6', label: 'Daily', route: 'TodoScreen' },
 
 ];
 

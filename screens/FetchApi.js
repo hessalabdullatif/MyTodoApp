@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, 
-    Text, StyleSheet, ImageBackground, ScrollView, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, ScrollView, RefreshControl } from 'react-native';
 
 const image = require('../assets/Unknown.jpg');
 
@@ -53,7 +52,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   text: {
-    fontSize: 25,
+    fontSize: 24,
     color: '#fff',
   },
 });
