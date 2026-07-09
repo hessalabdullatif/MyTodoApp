@@ -16,12 +16,14 @@ import { useAppTheme } from '../ThemeContext';
 const image = require('../assets/Unknown.jpg');
 
 const menuItems = [
-  { id: '1', label: 'Daily Todos', route: 'Todo' },
-  { id: '2', label: 'Important Todos', route: 'ImportantTodo' },
+
   { id: '3', label: 'Athkhar', route: 'TestScreen' },
   { id: '4', label: 'Movies', route: 'ViewScreen' },
   { id: '5', label: 'Fetch Weather', route: 'FetchApi' },
   { id: '6', label: 'Axios Weather', route: 'Weather' },
+    { id: '7', label: 'Form Sheet', route: 'FormSheet' },
+
+
 ];
 
 const FadeInView = ({ style, children }) => {
